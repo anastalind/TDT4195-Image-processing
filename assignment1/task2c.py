@@ -16,42 +16,38 @@ def convolve_im(im, kernel):
     Returns:
         [type]: [np.array of shape [H, W, 3]. should be same as im]
     """
-    # Getting the dimensions of the im matrix
-    im_size = im.shape
-
-    im_rows = im_size[0]
-    im_cols = im_size[1]
-
     # Creating output matrix
-    convolved_im = np.zeros((im_rows, im_cols, 3))
+    convolved_im = np.zeros_like(im)
 
     # Flip kernel
     kernel = np.flipud(np.fliplr(kernel))
 
-    # Find the center of the kernel
-    kernel_size = kernel.shape
+    # Getting the dimensions of the im matrix
+    im_rows = im.shape[0]
+    im_cols = im.shape[1]
 
-    kernel_rows = kernel_size[0]
-    kernel_cols = kernel_size[1]
+    # Getting the dimensions of the kernel matrix
+    kernel_rows = kernel.shape[0]
+    kernel_cols = kernel.shape[1]
 
-    kernel_center = (m.floor(kernel_rows/2), m.floor(kernel_cols/2))
+    # Defining center assuming kernel_rows and kernel_cols are odd numbers
+    kernel_center_x = m.floor(kernel_cols/2)
+    kernel_center_y = m.floor(kernel_rows/2)
 
     # Pad the image with the appropriate amount of rows and cols
-    im_padded = np.zeros((im_rows + (kernel_rows-1), im_cols + (kernel_cols-1), 3))
-    im_padded[kernel_center[0]:-kernel_center[0], kernel_center[1]:-kernel_center[1]]
+    image_padded = np.zeros((im_rows + (kernel_rows-1), im_cols + (kernel_cols-1), 3))
 
-    for row in range(im_rows):
-        for col in range(im_cols):
-            # Slicing im_padded matrix to extract a sub matrix of same size as kernel with first element in (row, col)
-            sub_matrix_R = im_padded[row:(row + kernel_rows), col:(col + (kernel_cols)), 0]
-            sub_matrix_G = im_padded[row:(row + kernel_rows), col:(col + (kernel_cols)), 1]
-            sub_matrix_B = im_padded[row:(row + kernel_rows), col:(col + (kernel_cols)), 2]
+    image_padded[kernel_center_y:-kernel_center_y, kernel_center_x:-kernel_center_x, 0] = im[:, :, 0]
+    image_padded[kernel_center_y:-kernel_center_y, kernel_center_x:-kernel_center_x, 1] = im[:, :, 1]
+    image_padded[kernel_center_y:-kernel_center_y, kernel_center_x:-kernel_center_x, 2] = im[:, :, 2]
 
-            # Multiply each element of submatrix with kernel, sum the elements and store in image_padded
-            convolved_im[row, col, 0] = (sub_matrix_R * kernel).sum()
-            convolved_im[row, col, 1] = (sub_matrix_G * kernel).sum()
-            convolved_im[row, col, 2] = (sub_matrix_B * kernel).sum()
 
+    # Iterating through all the cells of the image, convolving with the kernel and placing correctly in the convolved image
+    for col in range(im_cols):
+        for row in range(im_rows):
+            convolved_im[row, col, 0] = (kernel * image_padded[row:row+kernel_rows, col:col+kernel_cols, 0]).sum()
+            convolved_im[row, col, 1] = (kernel * image_padded[row:row+kernel_rows, col:col+kernel_cols, 1]).sum()
+            convolved_im[row, col, 2] = (kernel * image_padded[row:row+kernel_rows, col:col+kernel_cols, 2]).sum()
 
     return convolved_im
 
