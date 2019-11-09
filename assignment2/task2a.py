@@ -15,12 +15,31 @@ def MaxPool2d(im: np.array,
         im: [np.array of shape [H/kernel_size, W/kernel_size, 3]].
     """
     stride = kernel_size
-    ### START YOUR CODE HERE ### (You can change anything inside this block) 
+    ### START YOUR CODE HERE ### (You can change anything inside this block)
+    # Getting the dimensions of the im matrix
+    im_height = im.shape[0]
+    im_width = im.shape[1]
+    im_depth = im.shape[2]
 
+    # Setting dimensions of new im matrix
+    new_im_height = int(im_height/kernel_size)
+    new_im_width = int(im_width/kernel_size)
+    new_im_depth = im_depth
 
+    # Creating output matrix
+    new_im = np.zeros((new_im_height, new_im_width, new_im_depth))
+
+    print("Maxpoolin' \n")
+
+    for i in range(new_im_height):
+        for j in range(new_im_width):
+            for k in range(new_im_depth):
+                new_im[i, j, k] = np.max(im[(i * stride):(i * stride + kernel_size), (j * stride):(j * stride + kernel_size), k])
+
+    print("Done Maxpoolin' \n")
 
     return new_im
-    ### END YOUR CODE HERE ### 
+    ### END YOUR CODE HERE ###
 
 
 if __name__ == "__main__":
