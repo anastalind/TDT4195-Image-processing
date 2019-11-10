@@ -12,25 +12,47 @@ def convolve_im(im: np.array,
     """ Convolves the image (im) with the frequency kernel (fft_kernel),
         and returns the resulting image.
 
-        "verbose" can be used for visualizing different parts of the 
+        "verbose" can be used for visualizing different parts of the
         convolution
 
     Args:
         im: np.array of shape [H, W]
-        fft_kernel: np.array of shape [H, W] 
+        fft_kernel: np.array of shape [H, W]
         verbose: bool
     Returns:
         im: np.array of shape [H, W]
     """
     ### START YOUR CODE HERE ### (You can change anything inside this block)
     conv_result = im
+
+    # Compute the Fourier transform of the image
+    fft_im = np.fft.fft2(im)
+
+    # Compute the inverse Fourier transform of F(im)*F(kernel)
+    inverse_fft_im = np.fft.ifft2(fft_im * fft_kernel)
+
+    # Returns real values of complex values
+    conv_result = np.real(inverse_fft_im)
+
     if verbose:
         # Use plt.subplot to place two or more images beside eachother
-        plt.figure(figsize=(20, 4))
+        plt.figure(figsize=(20, 5))
+
         # plt.subplot(num_rows, num_cols, position (1-indexed))
-        plt.subplot(1, 5, 1)
+        plt.subplot(1, 4, 1)
+        plt.title("Original image")
         plt.imshow(im, cmap="gray")
-        plt.subplot(1, 5, 5) 
+
+        plt.subplot(1, 4, 2)
+        plt.title("Absolute value of F(f)")
+        plt.imshow(np.fft.fftshift(np.log(np.abs(fft_im))), cmap="gray")
+
+        plt.subplot(1, 4, 3)
+        plt.title("Absolute value of F(f*g)")
+        plt.imshow(np.fft.fftshift(np.log(np.abs(fft_im * fft_kernel))), cmap="gray")
+
+        plt.subplot(1, 4, 4)
+        plt.title("Filtered image")
         plt.imshow(conv_result, cmap="gray")
 
     ### END YOUR CODE HERE ###

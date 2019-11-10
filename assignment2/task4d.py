@@ -18,6 +18,10 @@ def sharpen(im: np.array):
         [0, -1, 0]
     ])
     ### START YOUR CODE HERE ### (You can change anything inside this block)
+    conv_im = convolve_im(im, laplacian, verbose=False)
+
+    im = im + conv_im
+
     ### END YOUR CODE HERE ###
     return im
 

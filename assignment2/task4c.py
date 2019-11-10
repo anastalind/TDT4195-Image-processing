@@ -2,6 +2,7 @@ import skimage
 import os
 import numpy as np
 import utils
+import matplotlib.pyplot as plt
 from task4b import convolve_im
 
 
@@ -14,9 +15,10 @@ if __name__ == "__main__":
     kernel = np.load("images/notch_filter.npy")
 
     ### START YOUR CODE HERE ### (You can change anything inside this block)
-    im_filtered = im
+    im_filtered = convolve_im(im, kernel, verbose=True)
+
+    #plt.savefig("plots/task4c_notch.png")
 
     ### END YOUR CODE HERE ###
 
     utils.save_im("clown_filtered.png", im_filtered)
-
