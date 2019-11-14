@@ -40,11 +40,11 @@ def otsu_thresholding(im: np.ndarray) -> int:
             # Computes the cumulative means
             m[k] += (i * p[i])
 
-    # Compute the between-class variance o^2 = (m_g * P_1 - m_k)^2/(P_1 * (1 - P_1)) for k = 0, 1, 2,.., L-1
     var = np.zeros(L)
     threshold = 128
     max_var = 0
 
+    # Compute the between-class variance o^2 = (m_g * P_1 - m_k)^2/(P_1 * (1 - P_1)) for k = 0, 1, 2,.., L-1 and find the k value for the max variance
     for k in range(L):
         var[k] = ((m_g * P_1[k] - m[k])**2)/(P_1[k]*(1-P_1[k]))
         if (var[k] > max_var):

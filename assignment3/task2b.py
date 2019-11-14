@@ -51,10 +51,13 @@ def find_8_neighbourhood(shape, row, col):
 
 def segment_neighbourhood(shape, segmented, row, col, T):
     for y, x in find_8_neighbourhood(shape, row, col):
+        # Calculate the absolute difference between the neighbour pixel and the center pixel
         abs_diff = np.abs(im[y, x] - im[row, col])
 
+        # Add to segmented image if not already in it and if the absolute difference is less than the threshold
         if not segmented[y, x] and (abs_diff <= T):
             segmented[y, x] = True
+            # Do segmentation of the neighbouring pixels recursively
             segment_neighbourhood(shape, segmented, y, x, T)
 
 

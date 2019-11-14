@@ -30,9 +30,13 @@ def distance_transform(im: np.ndarray) -> np.ndarray:
     eroded_im = im
 
     while not erosion_complete:
+        # Counts the number of erosion operations it takes to remove each pixel from the foreground
         result += eroded_im
+
+        # The erosion operation
         eroded_im = binary_erosion(eroded_im, selem=structuring_element)
 
+        # Check if all foreground pixels are completely eroded
         erosion_complete = not np.any(eroded_im)
 
     return result
