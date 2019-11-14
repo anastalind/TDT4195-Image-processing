@@ -1,6 +1,6 @@
 import utils
 import skimage
-import skimage.morphology
+from skimage.morphology import binary_opening, binary_closing, disk
 import numpy as np
 
 
@@ -14,8 +14,12 @@ def remove_noise(im: np.ndarray) -> np.ndarray:
     """
     ### START YOUR CODE HERE ### (You can change anything inside this block)
     # You can also define other helper functions
+
+    struct_elem = disk(7)
+    im = binary_closing(binary_opening(im, selem=struct_elem), selem=struct_elem)
+
     return im
-    ### END YOUR CODE HERE ### 
+    ### END YOUR CODE HERE ###
 
 
 if __name__ == "__main__":
@@ -33,4 +37,3 @@ if __name__ == "__main__":
 
     noise_free_image = utils.to_uint8(noise_free_image)
     utils.save_im("noisy-filtered.png", noise_free_image)
-

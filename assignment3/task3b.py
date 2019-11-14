@@ -1,6 +1,6 @@
 import utils
 import skimage
-import skimage.morphology
+from skimage.morphology import binary_erosion
 import numpy as np
 from task3a import remove_noise
 
@@ -17,14 +17,26 @@ def distance_transform(im: np.ndarray) -> np.ndarray:
     ### START YOUR CODE HERE ### (You can change anything inside this block)
     # You can also define other helper functions
     assert im.dtype == np.bool
+
     structuring_element = np.array([
         [1, 1, 1],
         [1, 1, 1],
         [1, 1, 1]
     ], dtype=bool)
+
     result = im.astype(np.int32)
+
+    erosion_complete = False
+    eroded_im = im
+
+    while not erosion_complete:
+        result += eroded_im
+        eroded_im = binary_erosion(eroded_im, selem=structuring_element)
+
+        erosion_complete = not np.any(eroded_im)
+
     return result
-    ### END YOUR CODE HERE ### 
+    ### END YOUR CODE HERE ###
 
 
 
@@ -43,9 +55,3 @@ if __name__ == "__main__":
 
     distance = utils.to_uint8(distance)
     utils.save_im("noisy-distance.png", distance)
-
-    
-    
-
-
-

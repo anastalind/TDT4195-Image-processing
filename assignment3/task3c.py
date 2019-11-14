@@ -1,6 +1,6 @@
 import utils
 import skimage
-import skimage.morphology
+from skimage.morphology import binary_erosion, binary_dilation
 import numpy as np
 
 
@@ -20,9 +20,10 @@ def extract_boundary(im: np.ndarray) -> np.ndarray:
         [1, 1, 1],
         [1, 1, 1]
     ], dtype=bool)
-    boundary = im
+    eroded_im = binary_erosion(im, selem=structuring_element)
+    boundary = np.bitwise_xor(im, eroded_im)
     return boundary
-    ### END YOUR CODE HERE ### 
+    ### END YOUR CODE HERE ###
 
 
 if __name__ == "__main__":
@@ -39,4 +40,3 @@ if __name__ == "__main__":
 
     boundary = utils.to_uint8(boundary)
     utils.save_im("lincoln-boundary.png", boundary)
-

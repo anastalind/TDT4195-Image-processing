@@ -1,19 +1,19 @@
 import utils
 import skimage
-import skimage.morphology
+from skimage.morphology import binary_dilation
 import numpy as np
 
 
 def fill_holes(im: np.ndarray, starting_points: list, num_iterations: int) -> np.ndarray:
     """
-        A function that takes a binary image (im),  and a set of points 
+        A function that takes a binary image (im),  and a set of points
         indicating position of holes, and fills the holes.
 
         args:
             im: np.ndarray of shape (H, W) with boolean values (dtype=np.bool)
             starting_points: list of list containing starting points (row, col). Ex:
                 [[row1, col1], [row2, col2], ...]
-            num_iterations: integer defining the number of iterations to apply the 
+            num_iterations: integer defining the number of iterations to apply the
                             hole filling algorithm
         return:
             (np.ndarray) of shape (H, W). dtype=np.bool
@@ -25,9 +25,19 @@ def fill_holes(im: np.ndarray, starting_points: list, num_iterations: int) -> np
         [1, 1, 1],
         [1, 1, 1]
     ], dtype=bool)
-    result = im.copy()
+
+    result = np.zeros((im.shape), dtype=bool)
+
+    for row, col in starting_points:
+        result[row, col] = True
+
+    for k in range(1, num_iterations):
+        result += np.bitwise_and(binary_dilation(result, selem=structuring_element), np.invert(im))
+
+    result = np.bitwise_or(result, im)
+
     return result
-    ### END YOUR CODE HERE ### 
+    ### END YOUR CODE HERE ###
 
 
 if __name__ == "__main__":
@@ -64,4 +74,3 @@ if __name__ == "__main__":
 
     result = utils.to_uint8(result)
     utils.save_im("balls-with-reflections-filled.png", result)
-

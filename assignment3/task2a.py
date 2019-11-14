@@ -15,12 +15,44 @@ def otsu_thresholding(im: np.ndarray) -> int:
             (int) the computed thresholding value
     """
     assert im.dtype == np.uint8
-    ### START YOUR CODE HERE ### (You can change anything inside this block) 
+    ### START YOUR CODE HERE ### (You can change anything inside this block)
     # You can also define other helper functions
+
+    # Number of intensity levels
+    L = 256
+
     # Compute normalized histogram
+    p, _ = np.histogram(im, bins=L, density=True)
+
+    # Compute the cumulative sums P_1(k) for k = 0, 1, 2,.., L-1, the cumulative means m_k for k = 0, 1, 2,.., L-1 and the global mean m_g
+    P_1 = np.zeros(L)
+    m = np.zeros(L)
+    m_g = 0
+
+    for k in range(L):
+        # Computes the global mean
+        m_g += (k * p[k])
+
+        for i in range(k + 1):
+            # Computes the cumulative sums
+            P_1[k] += p[i]
+
+            # Computes the cumulative means
+            m[k] += (i * p[i])
+
+    # Compute the between-class variance o^2 = (m_g * P_1 - m_k)^2/(P_1 * (1 - P_1)) for k = 0, 1, 2,.., L-1
+    var = np.zeros(L)
     threshold = 128
+    max_var = 0
+
+    for k in range(L):
+        var[k] = ((m_g * P_1[k] - m[k])**2)/(P_1[k]*(1-P_1[k]))
+        if (var[k] > max_var):
+            max_var = var[k]
+            threshold = k
+
     return threshold
-    ### END YOUR CODE HERE ### 
+    ### END YOUR CODE HERE ###
 
 
 if __name__ == "__main__":
@@ -47,5 +79,3 @@ if __name__ == "__main__":
 
         save_path = "{}-segmented.png".format(impath.stem)
         utils.save_im(save_path, segmented_image)
-
-

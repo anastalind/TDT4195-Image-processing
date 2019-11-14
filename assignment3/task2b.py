@@ -2,10 +2,66 @@ import utils
 import numpy as np
 
 
+def find_8_neighbourhood(shape, row, col):
+    neighbourhood = []
+
+    max_row, max_col = shape
+
+    # Top left
+    y = min(max(0, row - 1), max_row)
+    x = min(max(0, col - 1), max_col)
+    neighbourhood.append((y, x))
+
+    # Top center
+    y = min(max(0, row - 1), max_row)
+    x = col
+    neighbourhood.append((y, x))
+
+    # Top right
+    y = min(max(0, row - 1), max_row)
+    x = min(max(0, col + 1), max_col)
+    neighbourhood.append((y, x))
+
+    # Left
+    y = row
+    x = min(max(0, col - 1), max_col)
+    neighbourhood.append((y, x))
+
+    # Right
+    y = row
+    x = min(max(0, col + 1), max_col)
+    neighbourhood.append((y, x))
+
+    # Bottom left
+    y = min(max(0, row + 1), max_row)
+    x = min(max(0, col - 1), max_col)
+    neighbourhood.append((y, x))
+
+    # Bottom center
+    y = min(max(0, row + 1), max_row)
+    x = col
+    neighbourhood.append((y, x))
+
+    # Bottom right
+    y = min(max(0, row + 1), max_row)
+    x = min(max(0, col + 1), max_col)
+    neighbourhood.append((y, x))
+
+    return neighbourhood
+
+def segment_neighbourhood(shape, segmented, row, col, T):
+    for y, x in find_8_neighbourhood(shape, row, col):
+        abs_diff = np.abs(im[y, x] - im[row, col])
+
+        if not segmented[y, x] and (abs_diff <= T):
+            segmented[y, x] = True
+            segment_neighbourhood(shape, segmented, y, x, T)
+
+
 def region_growing(im: np.ndarray, seed_points: list, T: int) -> np.ndarray:
     """
         A region growing algorithm that segments an image into 1 or 0 (True or False).
-        Finds candidate pixels with a Moore-neighborhood (8-connectedness). 
+        Finds candidate pixels with a Moore-neighborhood (8-connectedness).
         Uses pixel intensity thresholding with the threshold T as the homogeneity criteria.
         The function takes in a grayscale image and outputs a boolean image
 
@@ -19,11 +75,15 @@ def region_growing(im: np.ndarray, seed_points: list, T: int) -> np.ndarray:
     """
     ### START YOUR CODE HERE ### (You can change anything inside this block)
     # You can also define other helper functions
+
     segmented = np.zeros_like(im).astype(bool)
+
     for row, col in seed_points:
         segmented[row, col] = True
+        segment_neighbourhood(im.shape, segmented, row, col, T)
+
     return segmented
-    ### END YOUR CODE HERE ### 
+    ### END YOUR CODE HERE ###
 
 
 
@@ -49,4 +109,3 @@ if __name__ == "__main__":
 
     segmented_image = utils.to_uint8(segmented_image)
     utils.save_im("defective-weld-segmented.png", segmented_image)
-
