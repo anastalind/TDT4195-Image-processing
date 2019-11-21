@@ -1,11 +1,11 @@
 import utils
 import numpy as np
 
-
 def find_8_neighbourhood(shape, row, col):
     neighbourhood = []
 
-    max_row, max_col = shape
+    max_row = shape[0] - 1
+    max_col = shape[1] - 1
 
     # Top left
     y = min(max(0, row - 1), max_row)
@@ -49,18 +49,6 @@ def find_8_neighbourhood(shape, row, col):
 
     return neighbourhood
 
-def segment_neighbourhood(shape, segmented, row, col, T):
-    for y, x in find_8_neighbourhood(shape, row, col):
-        # Calculate the absolute difference between the neighbour pixel and the center pixel
-        abs_diff = np.abs(im[y, x] - im[row, col])
-
-        # Add to segmented image if not already in it and if the absolute difference is less than the threshold
-        if not segmented[y, x] and (abs_diff <= T):
-            segmented[y, x] = True
-            # Do segmentation of the neighbouring pixels recursively
-            segment_neighbourhood(shape, segmented, y, x, T)
-
-
 def region_growing(im: np.ndarray, seed_points: list, T: int) -> np.ndarray:
     """
         A region growing algorithm that segments an image into 1 or 0 (True or False).
@@ -81,9 +69,23 @@ def region_growing(im: np.ndarray, seed_points: list, T: int) -> np.ndarray:
 
     segmented = np.zeros_like(im).astype(bool)
 
-    for row, col in seed_points:
-        segmented[row, col] = True
-        segment_neighbourhood(im.shape, segmented, row, col, T)
+
+    for seed_row, seed_col in seed_points:
+        candidates = [(seed_row, seed_col)]
+
+        while len(candidates) > 0:
+            row, col = candidates.pop(0)
+
+            # Converting np.uint8 to ints to avoid overflow error
+            a, b = map(int, (im[seed_row, seed_col], im[row, col]))
+
+            # Calculate the absolute difference between the neighbour pixel and the center pixel
+            abs_diff = np.abs(a - b)
+
+            # Add to segmented image if not already in it and if the absolute difference is less than the threshold
+            if not segmented[row, col] and (abs_diff <= T):
+                segmented[row, col] = True
+                candidates += find_8_neighbourhood(im.shape, row, col)
 
     return segmented
     ### END YOUR CODE HERE ###
